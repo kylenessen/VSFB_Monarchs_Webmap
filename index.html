@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VSFB Monarch Deployment Locations</title>
+    <!-- leaflet css -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        body{
+            margin: 0;
+            padding: 0%;
+        }
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+</body>
+</html>
+
+<!-- leaflet js script-->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+    var coordinates = [34.68444928548566, -120.58691739466005];
+    var map = L.map('map').setView(coordinates, 12);
+
+    var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+    var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        //attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+    Esri_WorldImagery.addTo(map);
+    //osm.addTo(map);
+
+    var myIcon = L.icon({
+        iconUrl: 'icon/camera.svg',
+        iconSize: [60,60]
+    }) 
+    
+
+    fetch('data/deployment_pts.geojson')
+    .then(response => response.json())
+    .then(data => {
+        L.geoJSON(data, {
+            pointToLayer: function (feature, latlng) {
+                var greenSize = 40; // Absolute size of green.svg
+                var monarchSize = greenSize * 0.25; // Relative size of monarch.svg
+
+                var html = '<svg width="' + greenSize + '" height="' + greenSize + '" style="transform: rotate(' + (feature.properties.view_direction) + 'deg);">' +
+                           '<image href="icon/green.svg" width="' + greenSize + '" height="' + greenSize + '"/>';
+
+                if (feature.properties.monarchs_present) {
+                    var monarchPosition = (greenSize - monarchSize) / 2; // Position the monarch in the center of the green icon
+                    html += '<image href="icon/monarch.svg" x="' + monarchPosition + '" y="' + monarchPosition + '" width="' + monarchSize + '" height="' + monarchSize + '"/>';
+                }
+
+                html += '</svg>';
+
+                var myIcon = L.divIcon({
+                    className: 'my-icon',
+                    html: html,
+                });
+
+                return L.marker(latlng, {icon: myIcon});
+            },
+                onEachFeature: function (feature, layer) {
+                    layer.bindPopup(
+                        '<strong>Deployment ID:</strong> ' + feature.properties.deployment_id + '<br>' +
+                        '<strong>Deployed Time:</strong> ' + feature.properties.Deployed_time + '<br>' +
+                        '<strong>Recovered Time:</strong> ' + feature.properties.Recovered_time + '<br>' +
+                        '<strong>Height Above Ground (m):</strong> ' + feature.properties.height_m + '<br>' +
+                        '<strong>Horizontal Distance to Cluster (m):</strong> ' + feature.properties.horizontal_dist_to_cluster_m + '<br>' +
+                        '<strong>View Direction:</strong> ' + feature.properties.view_direction + '<br>'
+                    );
+                }
+            }).addTo(map);
+        });
+</script>
+
