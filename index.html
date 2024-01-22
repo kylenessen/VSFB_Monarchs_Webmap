@@ -42,7 +42,6 @@
         iconUrl: 'icon/camera.svg',
         iconSize: [60,60]
     }) 
-    
 
     fetch('data/deployment_pts.geojson')
     .then(response => response.json())
@@ -55,7 +54,7 @@
                 var html = '<svg width="' + greenSize + '" height="' + greenSize + '" style="transform: rotate(' + (feature.properties.view_direction) + 'deg);">' +
                            '<image href="icon/green.svg" width="' + greenSize + '" height="' + greenSize + '"/>';
 
-                if (feature.properties.monarchs_present) {
+                if (feature.properties.monarchs_present === "1") {
                     var monarchPosition = (greenSize - monarchSize) / 2; // Position the monarch in the center of the green icon
                     html += '<image href="icon/monarch.svg" x="' + monarchPosition + '" y="' + monarchPosition + '" width="' + monarchSize + '" height="' + monarchSize + '"/>';
                 }
@@ -69,17 +68,18 @@
 
                 return L.marker(latlng, {icon: myIcon});
             },
-                onEachFeature: function (feature, layer) {
-                    layer.bindPopup(
-                        '<strong>Deployment ID:</strong> ' + feature.properties.deployment_id + '<br>' +
-                        '<strong>Deployed Time:</strong> ' + feature.properties.Deployed_time + '<br>' +
-                        '<strong>Recovered Time:</strong> ' + feature.properties.Recovered_time + '<br>' +
-                        '<strong>Height Above Ground (m):</strong> ' + feature.properties.height_m + '<br>' +
-                        '<strong>Horizontal Distance to Cluster (m):</strong> ' + feature.properties.horizontal_dist_to_cluster_m + '<br>' +
-                        '<strong>View Direction:</strong> ' + feature.properties.view_direction + '<br>'
-                    );
-                }
-            }).addTo(map);
-        });
+            onEachFeature: function (feature, layer) {
+                var youtubeUrl = feature.properties.youtube_url.replace('https://youtu.be/', 'https://www.youtube.com/embed/');
+                layer.bindPopup(
+                    '<strong>Deployment ID:</strong> ' + feature.properties.deployment_id + '<br>' +
+                    '<strong>Deployed Time:</strong> ' + feature.properties.Deployed_time + '<br>' +
+                    '<strong>Recovered Time:</strong> ' + feature.properties.Recovered_time + '<br>' +
+                    '<strong>Height Above Ground (m):</strong> ' + feature.properties.height_m + '<br>' +
+                    '<strong>Horizontal Distance to Cluster (m):</strong> ' + feature.properties.horizontal_dist_to_cluster_m + '<br>' +
+                    '<strong>View Direction:</strong> ' + feature.properties.view_direction + '<br>' +
+                    '<iframe width="300" height="169" src="'+youtubeUrl+'" title="'+feature.properties.deployment_id+'" frameborder="0" allow="web-share" allowfullscreen></iframe>'
+                );
+            }
+        }).addTo(map);
+    });
 </script>
-
