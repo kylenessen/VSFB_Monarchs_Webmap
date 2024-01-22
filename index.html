@@ -72,8 +72,8 @@
                 var youtubeUrl = feature.properties.youtube_url.replace('https://youtu.be/', 'https://www.youtube.com/embed/');
                 layer.bindPopup(
                     '<strong>Deployment ID:</strong> ' + feature.properties.deployment_id + '<br>' +
-                    '<strong>Deployed Time:</strong> ' + feature.properties.Deployed_time + '<br>' +
-                    '<strong>Recovered Time:</strong> ' + feature.properties.Recovered_time + '<br>' +
+                    '<strong>Deployed Time:</strong> ' + new Date(feature.properties.Deployed_time).toLocaleString() + '<br>' +
+                    '<strong>Recovered Time:</strong> ' + new Date(feature.properties.Recovered_time).toLocaleString() + '<br>' +
                     '<strong>Height Above Ground (m):</strong> ' + feature.properties.height_m + '<br>' +
                     '<strong>Horizontal Distance to Cluster (m):</strong> ' + feature.properties.horizontal_dist_to_cluster_m + '<br>' +
                     '<strong>View Direction:</strong> ' + feature.properties.view_direction + '<br>' +
